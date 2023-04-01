@@ -2,12 +2,17 @@ import { useState } from 'react';
 import './App.css';
 
 function Board() {
+  const [xIsNext, setXIsNext] = useState(true);
   const [squres, setSqures] = useState(Array(9).fill(null));
   const handleSqureClick = (i) => {
+    if(squres[i]){
+      return;
+    }
     let nextSqures = squres.slice();
-    console.log(nextSqures);
-    nextSqures[i] = "X";
+
+    xIsNext ? nextSqures[i] = "X" : nextSqures[i] = "0";
     setSqures(nextSqures);
+    setXIsNext(!xIsNext);
   };
 
 

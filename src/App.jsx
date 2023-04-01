@@ -1,9 +1,48 @@
 import { useState } from 'react';
 import './App.css';
 
-function Board() {
-  const [xIsNext, setXIsNext] = useState(true);
-  const [squares, setSquares] = useState(Array(9).fill(null));
+function GameHistory() {
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [currentMove, setCurrentMove] = useState(0);
+  const currentSquares = history[currentMove];
+  const xIsNext = currentMove % 2 === 0;
+
+  const handlePlay = (nextSquares) => {
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
+  };
+  const jumpTo = (nextMove) => {
+    setCurrentMove(nextMove);
+  };
+
+  const moves = history.map((squares, move) => {
+    let description;
+    if (move > 0) {
+      description = 'Go to move #' + move;
+    } else {
+      description = 'Go to game start';
+    }
+    return (
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}>{description}</button>
+      </li>
+    );
+  });
+  
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay}/>
+      </div>
+      <div className="game-info">
+        <ol>{ moves }</ol>
+      </div>
+    </div>
+  );
+};
+
+function Board({ xIsNext, squares, onPlay }) {
   const handleSqureClick = (i) => {
     if(squares[i] || calculateWinner(squares)){
       return;
@@ -11,8 +50,7 @@ function Board() {
     let nextSquares = squares.slice();
 
     xIsNext ? nextSquares[i] = "X" : nextSquares[i] = "0";
-    setSquares(nextSquares);
-    setXIsNext(!xIsNext);
+    onPlay(nextSquares);
   };
   const winner = calculateWinner(squares);
   let status;
@@ -22,32 +60,31 @@ function Board() {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
-
   return (
     <div className="App">
       <div className="status">{status}</div>
       <div className="board-row">
-        <Squre value={squares[0]} handleSqureClick={() => handleSqureClick(0)}/>
-        <Squre value={squares[1]} handleSqureClick={() => handleSqureClick(1)}/>
-        <Squre value={squares[2]} handleSqureClick={() => handleSqureClick(2)}/>
+        <Square value={squares[0]} handleSqureClick={() => handleSqureClick(0)}/>
+        <Square value={squares[1]} handleSqureClick={() => handleSqureClick(1)}/>
+        <Square value={squares[2]} handleSqureClick={() => handleSqureClick(2)}/>
       </div>
       <div className="board-row">
-        <Squre value={squares[3]} handleSqureClick={() => handleSqureClick(3)}/>
-        <Squre value={squares[4]} handleSqureClick={() => handleSqureClick(4)}/>
-        <Squre value={squares[5]} handleSqureClick={() => handleSqureClick(5)}/>
+        <Square value={squares[3]} handleSqureClick={() => handleSqureClick(3)}/>
+        <Square value={squares[4]} handleSqureClick={() => handleSqureClick(4)}/>
+        <Square value={squares[5]} handleSqureClick={() => handleSqureClick(5)}/>
       </div>
       <div className="board-row">
-        <Squre value={squares[6]} handleSqureClick={() => handleSqureClick(6)}/>
-        <Squre value={squares[7]} handleSqureClick={() => handleSqureClick(7)}/>
-        <Squre value={squares[8]} handleSqureClick={() => handleSqureClick(8)}/>
+        <Square value={squares[6]} handleSqureClick={() => handleSqureClick(6)}/>
+        <Square value={squares[7]} handleSqureClick={() => handleSqureClick(7)}/>
+        <Square value={squares[8]} handleSqureClick={() => handleSqureClick(8)}/>
       </div>
     </div>
   )
 };
-function Squre({ value, handleSqureClick }) {
+function Square({ value, handleSqureClick }) {
   return (
     <button 
-      className="squre"
+      className="square"
       onClick={handleSqureClick}
     >
       {value}
@@ -76,4 +113,4 @@ function calculateWinner(squares) {
 }
 
 
-export default Board;
+export default GameHistory;
